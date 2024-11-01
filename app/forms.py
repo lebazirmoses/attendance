@@ -3,6 +3,7 @@ from wtforms import StringField, PasswordField, SubmitField, SelectField, DateFi
 from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 from wtforms.validators import DataRequired, Length, Optional
 from .models import User, Choir
+from wtforms import StringField, SelectMultipleField, SubmitField
 
 class LoginForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
@@ -53,5 +54,6 @@ class AttendanceFilterForm(FlaskForm):
     submit = SubmitField('Filter')
 
 class AddChoirForm(FlaskForm):
-    name = StringField("Choir Name", validators=[DataRequired()])
-    submit = SubmitField("Save Choir")
+    name = StringField('Choir Name', validators=[DataRequired()])
+    members = SelectMultipleField('Members', coerce=int)  # Allow selection of multiple members
+    submit = SubmitField('Submit')

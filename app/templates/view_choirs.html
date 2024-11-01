@@ -9,6 +9,7 @@
             <tr>
                 <th>ID</th>
                 <th>Name</th>
+                <th>Members</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -17,6 +18,22 @@
                 <tr>
                     <td>{{ choir.id }}</td>
                     <td>{{ choir.name }}</td>
+                    <td>
+                        {% if choir.members %}
+                            <button class="btn btn-link" data-toggle="collapse" data-target="#members-{{ choir.id }}">
+                                View Members ({{ choir.members | length }})
+                            </button>
+                            <div id="members-{{ choir.id }}" class="collapse mt-2">
+                                <ul>
+                                    {% for member in choir.members %}
+                                        <li>{{ member.name }} ({{ member.role }})</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% else %}
+                            No members assigned
+                        {% endif %}
+                    </td>
                     <td>
                         <a href="{{ url_for('main.edit_choir', choir_id=choir.id) }}" class="btn btn-secondary">Edit</a>
                     </td>

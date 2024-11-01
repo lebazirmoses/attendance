@@ -195,7 +195,7 @@ def add_choir():
 
     return render_template("add_choir.html", form=form)
 
-@main.route("/view_choirs") 
+@main.route("/view_choirs")
 @login_required
 def view_choirs():
     if current_user.role != "organizer":
@@ -204,7 +204,6 @@ def view_choirs():
 
     choirs = Choir.query.all()
     return render_template("view_choirs.html", choirs=choirs)
-
 @main.route("/edit_choir/<int:choir_id>", methods=["GET", "POST"])
 @login_required
 def edit_choir(choir_id):
@@ -216,12 +215,24 @@ def edit_choir(choir_id):
     form = AddChoirForm(obj=choir)
 
     if form.validate_on_submit():
+        # Update choir name
         choir.name = form.name.data
+
+        # Update members if needed
+        selected_members = form.members.data
+        choir.members = User.query.filter(User.id.in_(selected_members)).all()
+
         db.session.commit()
         flash("Choir updated successfully.", "success")
         return redirect(url_for("main.view_choirs"))
 
+    # For pre-filling the form, also get current members
+    form.members.choices = [(user.id, user.name) for user in User.query.all()]
+    current_member_ids = [member.id for member in choir.members]
+    form.members.data = current_member_ids
+
     return render_template("edit_choir.html", form=form, choir=choir)
+
 
 @main.route("/profile", methods=["GET", "POST"])
 @login_required
