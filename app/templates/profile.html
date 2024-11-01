@@ -3,55 +3,104 @@
 {% block title %}Profile{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1>Your Profile</h1>
+<div class="container mt-4">
+    <h1 class="text-center mb-4">My Profile</h1>
+    
     <form method="POST">
         {{ form.hidden_tag() }}
-        <div class="form-group">
-            <label for="name">Name</label>
-            {{ form.name(class="form-control", id="name") }}
-            {% for error in form.name.errors %}
-                <div class="alert alert-danger">{{ error }}</div>
-            {% endfor %}
+        
+        <div class="form-row mt-3">
+            <div class="col-md-6 mb-3">
+                {{ form.name.label(class="form-label") }}
+                {{ form.name(class="form-control" if form.name.errors else "form-control is-valid") }}
+                {% if form.name.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.name.errors[0] }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.username.label(class="form-label") }}
+                {{ form.username(class="form-control" if form.username.errors else "form-control is-valid") }}
+                {% if form.username.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.username.errors[0] }}
+                    </div>
+                {% endif %}
+            </div>
         </div>
-        <div class="form-group">
-            <label for="password">username</label>
-            {{ form.username(class="form-control", id="username") }}
-            {% for error in form.username.errors %}
-                <div class="alert alert-danger">{{ error }}</div>
-            {% endfor %}
-            <small class="form-text text-muted">Leave blank to keep the current username.</small>
+
+        <div class="form-row">
+            <div class="col-md-6 mb-3">
+                {{ form.dob.label(class="form-label") }}
+                {{ form.dob(class="form-control" if form.dob.errors else "form-control is-valid") }}
+                {% if form.dob.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.dob.errors[0] }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form.mobile.label(class="form-label") }}
+                {{ form.mobile(class="form-control" if form.mobile.errors else "form-control is-valid") }}
+                {% if form.mobile.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.mobile.errors[0] }}
+                    </div>
+                {% endif %}
+            </div>
         </div>
-        <div class="form-group">
-            <label for="dob">Date of Birth</label>
-            {{ form.dob(class="form-control", id="dob") }}
-            {% for error in form.dob.errors %}
-                <div class="alert alert-danger">{{ error }}</div>
-            {% endfor %}
+
+        <div class="form-row">
+            <div class="col-md-6 mb-3">
+                {{ form.password.label(class="form-label") }}
+                {{ form.password(class="form-control") }}
+                <small class="form-text text-muted">Leave blank to keep current password.</small>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Role</label>
+                <input type="text" class="form-control" value="{{ current_user.role }}" readonly>
+            </div>
         </div>
+
         <div class="form-group">
-            <label for="mobile">Mobile</label>
-            {{ form.mobile(class="form-control", id="mobile") }}
-            {% for error in form.mobile.errors %}
-                <div class="alert alert-danger">{{ error }}</div>
-            {% endfor %}
+            <label class="form-label">Choirs:</label>
+            <ul class="list-group">
+                {% for choir in current_user.choirs %}  {# Assuming current_user.choirs contains only the user's choirs #}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ choir.name }}  {# Assuming each choir has a name attribute #}
+                        <span class="badge badge-success">Member</span>
+                    </li>
+                {% else %}
+                    <li class="list-group-item">No choirs available.</li>
+                {% endfor %}
+            </ul>
         </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            {{ form.password(class="form-control", id="password") }}
-            {% for error in form.password.errors %}
-                <div class="alert alert-danger">{{ error }}</div>
-            {% endfor %}
-            <small class="form-text text-muted">Leave blank to keep the current password.</small>
-        </div>
-        <button type="submit" class="btn btn-primary">Update Profile</button>
+
+        <button type="submit" class="btn btn-primary mt-3">Update Profile</button>
     </form>
-    <hr>
-    <h2>Your Attendance Records</h2>
-    <ul>
-        {% for record in attendance_records %}
-            <li>{{ record.date }}: {{ record.status }}</li>
-        {% endfor %}
-    </ul>
+
+    <!-- Attendance Trends Section -->
+    <h3 class="mt-5 text-center">Attendance Trends</h3>
+    <table class="table table-hover mt-3">
+        <thead class="thead-light">
+            <tr>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for date, status in attendance_trends %}
+                <tr>
+                    <td>{{ date.strftime('%d %b %Y') }}</td>
+                    <td>{{ status | capitalize }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="2" class="text-center">No attendance trends available.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

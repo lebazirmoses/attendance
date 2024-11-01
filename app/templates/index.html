@@ -3,9 +3,39 @@
 {% block title %}Home - Attendance System{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2>Welcome to the Attendance System</h2>
-    <p>Please log in to access your dashboard.</p>
-    <a href="{{ url_for('main.login') }}" class="btn">Login</a>
+<div class="container text-center mt-5">
+    <h1 class="display-4 font-weight-bold">Attendance System</h1>
+    <p class="lead">Manage your attendance efficiently and effectively.</p>
+    <a href="{{ url_for('main.login') }}" class="btn btn-primary btn-lg mt-4">Login</a>
 </div>
+
+<div class="container mt-5">
+    <div class="row text-center">
+        <div class="col-md-4 mb-4">
+            <div class="card border-light shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">User-Friendly Interface</h5>
+                    <p class="card-text">Navigate effortlessly with our intuitive design.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card border-light shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Real-Time Updates</h5>
+                    <p class="card-text">Stay informed with immediate notifications.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card border-light shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Accessible Anywhere</h5>
+                    <p class="card-text">Your attendance records at your fingertips, anytime.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

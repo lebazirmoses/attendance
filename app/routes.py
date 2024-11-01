@@ -2,9 +2,9 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from .forms import LoginForm, AddUserForm, AttendanceFilterForm, AddChoirForm, AddAttendanceForm, ProfileForm
-from .models import User, Attendance, Choir
+from .models import User, Attendance, Choir, Event
 from . import db, login_manager 
-from datetime import datetime
+from datetime import datetime, date
 from uuid import uuid4
 
 main = Blueprint("main", __name__)
@@ -33,20 +33,59 @@ def login():
 @main.route("/dashboard")
 @login_required
 def dashboard():
-    return render_template("organizer_dashboard.html" if current_user.role == "organizer" else "member_dashboard.html")
-@main.route("/add_user", methods=["GET", "POST"])
+    # Check if the user is an organizer
+    if current_user.role == "organizer":
+        return render_template("organizer_dashboard.html")  # Redirect to the organizer dashboard if applicable
 
+    # Fetch user's attendance records
+    attendance_records = Attendance.query.filter_by(user_id=current_user.id).all()
 
+    # Calculate present and absent counts
+    present_count = sum(1 for record in attendance_records if record.status.lower() == 'present')
+    absent_count = sum(1 for record in attendance_records if record.status.lower() == 'absent')
+    total_days = len(attendance_records)
+    attendance_percentage = (present_count / total_days * 100) if total_days else 0
+
+    # Prepare attendance trends for the last 30 records
+    attendance_trends = attendance_records[-30:]  # Get the last 30 records for better insights
+    trend_labels = [record.date.strftime("%Y-%m-%d") for record in attendance_trends]
+    trend_data = [1 if record.status.lower() == 'present' else 0 for record in attendance_trends]
+
+    # Calculate average attendance percentage for the last 30 days
+    average_attendance_percentage = sum(trend_data) / len(trend_data) * 100 if trend_data else 0
+
+    # Fetch upcoming choir events for the user's choirs
+    upcoming_events = Event.query.join(Choir.members).filter(User.id == current_user.id, Event.date >= datetime.utcnow()).order_by(Event.date).limit(5).all()
+
+    return render_template(
+        "member_dashboard.html",
+        present_count=present_count,
+        absent_count=absent_count,
+        attendance_percentage=attendance_percentage,
+        attendance_trends=attendance_trends,
+        upcoming_events=upcoming_events,
+        total_days=total_days,
+        trend_labels=trend_labels,
+        trend_data=trend_data,
+        average_attendance_percentage=average_attendance_percentage  # Pass the average attendance percentage
+    )
 
 @main.route("/add_user", methods=["GET", "POST"])
 @login_required
 def add_user():
+    # Check if the current user has the organizer role
     if current_user.role != "organizer":
         flash("You do not have permission to view this page.", "danger")
         return redirect(url_for("main.index"))
 
     form = AddUserForm()
+
+    # Fetch all choirs for rendering checkboxes in the form
+    form.choirs.choices = [(choir.id, choir.name) for choir in Choir.query.all()]
+
+    # Validate the form submission
     if form.validate_on_submit():
+        # Create a unique username based on the user's name
         base_username = form.name.data.lower().replace(" ", "")
         username = base_username
         counter = 1
@@ -54,13 +93,14 @@ def add_user():
             username = f"{base_username}{counter}"
             counter += 1
 
-        password = f"{username}123"
-        
+        password = f"{username}123"  # Default password
+
         # Generate a unique member_id
         member_id = str(uuid4())
         while User.query.filter_by(member_id=member_id).first():
             member_id = str(uuid4())  # Regenerate until unique
 
+        # Create a new user object
         new_user = User(
             member_id=member_id,
             username=username,
@@ -69,21 +109,25 @@ def add_user():
             role=form.role.data
         )
 
-        # Add selected choirs to the new user
-        selected_choirs = form.choirs.data
-        new_user.choirs.extend(selected_choirs)
+        # Capture selected choirs from the form
+        selected_choirs = request.form.getlist('choirs')
+        choirs = Choir.query.filter(Choir.id.in_(selected_choirs)).all()
+        new_user.choirs.extend(choirs)
 
+        # Attempt to add the new user to the database
         try:
             db.session.add(new_user)
             db.session.commit()
             flash(f"User added successfully. Inform the user that their password is '{password}'.", "success")
             return redirect(url_for("main.view_users"))
         except Exception as e:
-            db.session.rollback()
+            db.session.rollback()  # Roll back in case of error
             flash(f"Error adding user: {str(e)}", "danger")
             return redirect(url_for("main.add_user"))
 
+    # Render the add user form
     return render_template("add_user.html", form=form)
+
 
 
 @main.route("/view_users", methods=["GET"])
@@ -232,7 +276,7 @@ def add_attendance():
 
             db.session.commit()
             flash("Attendance records updated successfully.", "success")
-            return redirect(url_for("main.view_attendance", choir_id=selected_choir_id, date=date_str))
+            return redirect(url_for("main.dashboard"))  # Redirect to dashboard after attendance is updated
 
         except ValueError:
             flash("Invalid date format. Please use YYYY-MM-DD.", "danger")
@@ -248,6 +292,7 @@ def add_attendance():
         form=form,
         selected_choir_id=selected_choir_id
     )
+
 
 @main.route("/delete_user/<int:user_id>", methods=["POST"])
 @login_required
@@ -329,17 +374,16 @@ def profile():
     form = ProfileForm(obj=current_user)
 
     if form.validate_on_submit():
-        # Check for unique username
         if User.query.filter(User.id != current_user.id, User.username == form.username.data).first():
             flash("Username already exists.", "warning")
             return redirect(url_for("main.profile"))
 
-        # Update user details
         current_user.name = form.name.data
         current_user.mobile = form.mobile.data
         current_user.dob = form.dob.data
+        current_user.address = form.address.data  # New field for address
+        current_user.emergency_contact = form.emergency_contact.data  # New field for emergency contact
 
-        # Update password only if provided
         if form.password.data:
             current_user.password = generate_password_hash(form.password.data)
 
@@ -347,11 +391,16 @@ def profile():
         flash("Profile updated successfully.", "success")
         return redirect(url_for("main.profile"))
 
-    # Fetch the user's attendance records
+    # Fetch attendance records and calculate insights
     attendance_records = Attendance.query.filter_by(user_id=current_user.id).all()
+    attendance_trends = [(record.date, record.status) for record in attendance_records]  # For visualization
 
-    return render_template("profile.html", form=form, attendance_records=attendance_records)
-
+    return render_template(
+        "profile.html",
+        form=form,
+        attendance_records=attendance_records,
+        attendance_trends=attendance_trends
+    )   
 
 @main.route("/logout")
 @login_required

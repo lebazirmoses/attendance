@@ -1,11 +1,108 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - Attendance System{% endblock %}
-
 {% block content %}
 <div class="container">
-    <h2>Dashboard</h2>
-    <p>Welcome to your dashboard, {{ current_user.username }}!</p>
-    <a href="{{ url_for('main.logout') }}" class="btn">Logout</a>
+    <h1 class="text-center mb-4">Welcome, {{ current_user.name }}!</h1>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Attendance Overview</h5>
+                    <p><strong>Total Days Attended:</strong> <span class="text-success">{{ present_count }}</span></p>
+                    <p><strong>Total Days Absent:</strong> <span class="text-danger">{{ absent_count }}</span></p>
+                    <p><strong>Attendance Percentage:</strong> <span class="text-info">{{ attendance_percentage | round(2) }}%</span></p>
+                    <p><strong>Average Attendance (Last 30 Days):</strong> <span class="text-warning">{{ average_attendance_percentage | round(2) }}%</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Recent Attendance Trends</h5>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in attendance_trends %}
+                            <tr>
+                                <td>{{ record.date.strftime('%d %b %Y') }}</td>
+                                <td>{{ record.status }}</td>
+                            </tr>
+                            {% endfor %}
+                            {% if attendance_trends|length == 0 %}
+                            <tr>
+                                <td colspan="2">No attendance records found.</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="mt-5 text-center">Attendance Trend Chart</h2>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <canvas id="attendanceTrendChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('attendanceTrendChart').getContext('2d');
+        const attendanceTrendChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ trend_labels|tojson }},
+                datasets: [{
+                    label: 'Attendance Trend',
+                    data: {{ trend_data|tojson }},
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4  // Smooth line
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                const date = tooltipItem.label;
+                                const status = tooltipItem.raw === 1 ? 'Present' : 'Absent';
+                                return `${date}: ${status}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Attendance'
+                        },
+                        ticks: {
+                            stepSize: 1
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 </div>
 {% endblock %}

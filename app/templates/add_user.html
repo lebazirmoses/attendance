@@ -4,33 +4,107 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Add New User</h1>
-    <form method="POST">
+    <h1 class="display-4 text-center mb-4">Add New User</h1>
+    <form method="POST" class="needs-validation" novalidate>
         {{ form.hidden_tag() }}
+
+        <!-- User Name Input -->
         <div class="form-group">
             <label for="name">Name</label>
-            {{ form.name(class="form-control", id="name") }}
+            {{ form.name(class="form-control", id="name", placeholder="Enter user's name", required=True) }}
             {% for error in form.name.errors %}
                 <div class="alert alert-danger">{{ error }}</div>
             {% endfor %}
         </div>
+
+        <!-- Choirs Selection -->
         <div class="form-group">
-            <label for="choirs">Choirs</label>
-            {{ form.choirs(class="form-control", id="choirs") }}
+            <label>Choirs</label>
+            <input type="text" id="searchChoir" class="form-control mb-3" placeholder="Search choirs...">
+            <button type="button" class="btn btn-secondary mb-3" onclick="toggleAllChoirs()">Toggle All</button>
+            <div class="choir-list border p-3 rounded" style="max-height: 200px; overflow-y: auto;">
+                {% for choir_id, choir_name in form.choirs.choices %}
+                    <div class="form-check choir-item">
+                        <input class="form-check-input" type="checkbox" id="choir_{{ choir_id }}" name="choirs" value="{{ choir_id }}" 
+                        {% if choir_id in form.choirs.data %} checked {% endif %}>
+                        <label class="form-check-label" for="choir_{{ choir_id }}">
+                            {{ choir_name }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
             {% for error in form.choirs.errors %}
                 <div class="alert alert-danger">{{ error }}</div>
             {% endfor %}
         </div>
-        
+
+        <!-- Role Selection -->
         <div class="form-group">
             <label for="role">Role</label>
-            {{ form.role(class="form-control", id="role") }}
+            {{ form.role(class="form-control", id="role", required=True) }}
             {% for error in form.role.errors %}
                 <div class="alert alert-danger">{{ error }}</div>
             {% endfor %}
         </div>
-        <button type="submit" class="btn btn-primary">Add User</button>
-        <a href="{{ url_for('main.view_users') }}" class="btn btn-secondary">Cancel</a>
+
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-between mt-4">
+            <button type="submit" class="btn btn-primary">Add User</button>
+            <a href="{{ url_for('main.view_users') }}" class="btn btn-secondary">Cancel</a>
+        </div>
     </form>
 </div>
+
+<!-- Optional: Add custom JavaScript for enhanced validation -->
+<script>
+    (function () {
+        'use strict';
+
+        // Enable Bootstrap validation
+        var forms = document.querySelectorAll('.needs-validation');
+
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+
+    // Function to toggle all choir checkboxes
+    function toggleAllChoirs() {
+        const checkboxes = document.querySelectorAll('.choir-list input[type="checkbox"]');
+        const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = !allChecked;
+        });
+    }
+
+    // Search functionality for choirs
+    document.getElementById('searchChoir').addEventListener('keyup', function() {
+        const filter = this.value.toLowerCase();
+        const choirItems = document.querySelectorAll('.choir-item');
+
+        choirItems.forEach(item => {
+            const label = item.querySelector('label').textContent.toLowerCase();
+            item.style.display = label.includes(filter) ? '' : 'none';
+        });
+    });
+</script>
+
+<style>
+    .choir-list {
+        border: 1px solid #dee2e6;
+        border-radius: .25rem;
+        padding: 10px;
+        background-color: #f8f9fa;
+        transition: background-color 0.3s ease;
+    }
+    .choir-list:hover {
+        background-color: #e9ecef;
+    }
+</style>
 {% endblock %}

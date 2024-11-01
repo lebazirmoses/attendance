@@ -3,19 +3,123 @@
 {% block title %}Login - Attendance System{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2>Login</h2>
-    <form method="POST" action="{{ url_for('main.login') }}">
+<div class="container d-flex align-items-center justify-content-center vh-100">
+    <form class="form" method="POST" action="{{ url_for('main.login') }}">
         {{ form.hidden_tag() }}
-        <div>
-            {{ form.username.label }} {{ form.username(size=32) }}
-        </div>
-        <div>
-            {{ form.password.label }} {{ form.password(size=32) }}
-        </div>
-        <div>
-            {{ form.submit(class="btn") }}
-        </div>
+        <span class="input-span">
+            <label for="username" class="label">Username</label>
+            {{ form.username(class="form-control", type="text", id="username") }}
+        </span>
+        <span class="input-span">
+            <label for="password" class="label">Password</label>
+            {{ form.password(class="form-control", id="password") }}
+        </span>
+
+        <input class="submit" type="submit" value="Log in" />
+
     </form>
 </div>
+
+<style>
+    body {
+        background-color: #f4f7fa;
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        max-width: 100%;
+        padding: 0 15px;
+    }
+
+    .form {
+        --bg-light: #efefef;
+        --bg-dark: #707070;
+        --clr: #58bc82;
+        --clr-alpha: #9c9c9c60;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        width: 100%;
+        max-width: 400px; /* Adjusted max-width for larger screens */
+        margin: auto; /* Centering the form */
+        padding: 20px; /* Padding for smaller screens */
+        border-radius: 8px;
+        background-color: white; /* Added background color for the form */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    }
+
+    .form .input-span {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form input[type="text"],
+    .form input[type="password"] {
+        border-radius: 0.5rem;
+        padding: 1rem 0.75rem;
+        width: 100%;
+        border: none;
+        background-color: var(--clr-alpha);
+        outline: 2px solid var(--bg-dark);
+        transition: outline 0.3s;
+    }
+
+    .form input[type="text"]:focus,
+    .form input[type="password"]:focus {
+        outline: 2px solid var(--clr);
+    }
+
+    .label {
+        align-self: flex-start;
+        color: var(--clr);
+        font-weight: 600;
+    }
+
+    .form .submit {
+        padding: 1rem 0.75rem;
+        width: 100%;
+        border-radius: 3rem;
+        background-color: var(--bg-dark);
+        color: var(--bg-light);
+        border: none;
+        cursor: pointer;
+        transition: background-color 300ms, color 300ms;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .form .submit:hover {
+        background-color: var(--clr);
+        color: var(--bg-dark);
+    }
+
+    .span {
+        text-decoration: none;
+        color: var(--bg-dark);
+        font-size: 0.8rem; /* Slightly smaller font size for links */
+    }
+
+    .span a {
+        color: var(--clr);
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 576px) {
+        .form {
+            padding: 15px; /* Less padding for smaller screens */
+        }
+
+        .form .submit {
+            font-size: 1rem; /* Slightly larger button text for better readability */
+        }
+
+        .label {
+            font-size: 0.9rem; /* Smaller label font for mobile */
+        }
+    }
+</style>
 {% endblock %}
