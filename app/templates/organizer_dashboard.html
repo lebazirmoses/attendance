@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Organizer Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="display-4 text-center mb-4">Welcome, {{ current_user.name }}!</h1>
+    <h2 class="text-center mb-5">Organizer Dashboard</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">
+                        <i class="fas fa-users"></i> Manage Choirs
+                    </h5>
+                    <p class="card-text">Total Choirs: {{ total_choirs }}</p>
+                    <a href="{{ url_for('main.add_choir') }}" class="btn btn-primary" data-toggle="tooltip" title="Add a new choir">Add New Choir</a>
+                    <a href="{{ url_for('main.view_choirs') }}" class="btn btn-secondary" data-toggle="tooltip" title="View existing choirs">View Choirs</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">
+                        <i class="fas fa-user-friends"></i> Manage Users
+                    </h5>
+                    <p class="card-text">Total Users: {{ total_users }}</p>
+                    <a href="{{ url_for('main.add_user') }}" class="btn btn-primary" data-toggle="tooltip" title="Add a new user">Add New User</a>
+                    <a href="{{ url_for('main.view_users') }}" class="btn btn-secondary" data-toggle="tooltip" title="View registered users">View Users</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">
+                        <i class="fas fa-calendar-check"></i> Manage Attendance
+                    </h5>
+                    <p class="card-text">Total Attendance Records: {{ total_attendance }}</p>
+                    <a href="{{ url_for('main.view_attendance') }}" class="btn btn-secondary" data-toggle="tooltip" title="View attendance records">View Attendance Records</a>
+                    <a href="{{ url_for('main.add_attendance') }}" class="btn btn-primary" data-toggle="tooltip" title="Add a new attendance record">Add Attendance Record</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">
+                        <i class="fas fa-cog"></i> Actions
+                    </h5>
+                    <p>You can use the buttons above to manage users and attendance records.</p>
+                    <a href="{{ url_for('main.logout') }}" class="btn btn-danger" data-toggle="tooltip" title="Logout from the system">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

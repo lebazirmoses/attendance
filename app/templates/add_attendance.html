@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Add Attendance{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Add Attendance</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.user_id.label(class="form-label") }}
+            {{ form.user_id(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.choir_id.label(class="form-label") }}
+            {{ form.choir_id(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.date.label(class="form-label") }}
+            {{ form.date(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.status.label(class="form-label") }}
+            {{ form.status(class="form-control") }}
+        </div>
+        <button type="submit" class="btn btn-primary">Add Attendance</button>
+    </form>
+    <a href="{{ url_for('main.view_attendance') }}" class="btn btn-secondary mt-3">View Attendance Records</a>
+</div>
+{% endblock %}

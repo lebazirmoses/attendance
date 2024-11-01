@@ -1,0 +1,125 @@
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f7fa; /* Soft light gray background for a modern feel */
+    color: #343a40; /* Dark text for contrast */
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5 {
+    color: #0056b3; /* A more subdued primary color for headings */
+}
+
+/* Navbar Styles */
+.navbar {
+    background-color: #0056b3; /* Deeper primary color */
+    transition: background-color 0.3s ease; /* Smooth transition for background color */
+}
+
+.navbar a {
+    color: #ffffff; /* White text for navbar links */
+    transition: color 0.3s ease; /* Smooth transition for link colors */
+}
+
+.navbar a:hover {
+    color: #ffc107; /* Highlight color on hover for better visibility */
+}
+
+/* Container Styles */
+.container {
+    margin-top: 20px;
+}
+
+/* Alert Styles */
+.alert {
+    border-radius: 0.5rem; /* Rounded corners for alerts */
+    transition: transform 0.3s ease; /* Transition for alert animations */
+}
+
+.alert:hover {
+    transform: scale(1.02); /* Slight scale effect on hover */
+}
+
+/* Card Styles */
+.card {
+    border: none; /* Remove default border */
+    border-radius: 0.5rem; /* Rounded corners for cards */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for card hover */
+    background-color: #ffffff; /* White background for cards */
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.card:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+}
+
+/* Button Styles */
+.btn {
+    border-radius: 50px; /* Rounded buttons */
+    padding: 10px 20px; /* Increased padding for a better touch target */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition for button hover */
+}
+
+.btn-primary {
+    background-color: #007bff; /* Primary button color */
+    border: none; /* Remove border */
+}
+
+.btn-primary:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+    transform: translateY(-2px); /* Lift effect on hover */
+}
+
+.btn-secondary {
+    background-color: #6c757d; /* Secondary button color */
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268; /* Darker shade on hover */
+}
+
+/* Footer Styles */
+footer {
+    background-color: #343a40; /* Dark footer */
+    color: #ffffff; /* White text in footer */
+    padding: 20px 0; /* Padding for footer */
+}
+
+footer a {
+    color: #ffffff; /* White links in footer */
+    transition: color 0.3s ease; /* Smooth transition for footer link colors */
+}
+
+footer a:hover {
+    color: #ffc107; /* Highlight color on hover */
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .navbar {
+        text-align: center; /* Center text in smaller screens */
+    }
+
+    .container {
+        margin-top: 10px; /* Less top margin for smaller screens */
+    }
+
+    .card {
+        margin-bottom: 20px; /* Spacing between cards */
+    }
+}
+
+/* Animation Styles */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in; /* Fade-in effect for elements */
+}

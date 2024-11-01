@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Add User{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Add New User</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            <label for="name">Name</label>
+            {{ form.name(class="form-control", id="name") }}
+            {% for error in form.name.errors %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            <label for="choirs">Choirs</label>
+            {{ form.choirs(class="form-control", id="choirs") }}
+            {% for error in form.choirs.errors %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+        
+        <div class="form-group">
+            <label for="role">Role</label>
+            {{ form.role(class="form-control", id="role") }}
+            {% for error in form.role.errors %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary">Add User</button>
+        <a href="{{ url_for('main.view_users') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

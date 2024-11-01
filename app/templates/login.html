@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Attendance System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Login</h2>
+    <form method="POST" action="{{ url_for('main.login') }}">
+        {{ form.hidden_tag() }}
+        <div>
+            {{ form.username.label }} {{ form.username(size=32) }}
+        </div>
+        <div>
+            {{ form.password.label }} {{ form.password(size=32) }}
+        </div>
+        <div>
+            {{ form.submit(class="btn") }}
+        </div>
+    </form>
+</div>
+{% endblock %}

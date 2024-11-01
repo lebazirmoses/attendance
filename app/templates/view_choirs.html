@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}View Choirs{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h1>Choirs</h1>
+    <a href="{{ url_for('main.add_choir') }}" class="btn btn-primary mb-4">Add New Choir</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for choir in choirs %}
+                <tr>
+                    <td>{{ choir.id }}</td>
+                    <td>{{ choir.name }}</td>
+                    <td>
+                        <a href="{{ url_for('main.edit_choir', choir_id=choir.id) }}" class="btn btn-secondary">Edit</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
