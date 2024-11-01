@@ -4,24 +4,44 @@
 
 {% block content %}
 <h2>Attendance Records</h2>
+
+<!-- Filter Form -->
+<form method="get" action="{{ url_for('main.view_attendance') }}">
+    <div class="form-group">
+        <label for="choir">Choir:</label>
+        <select name="choir_id" class="form-control" id="choir">
+            <option value="">Select Choir</option>
+            {% for choir in choirs %}
+                <option value="{{ choir.id }}">{{ choir.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="date">Date:</label>
+        <input type="date" name="date" class="form-control" id="date">
+    </div>
+    <button type="submit" class="btn btn-primary">Filter</button>
+</form>
+
+<!-- Attendance Records Table -->
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>User</th>
-            <th>Choir</th>
+            <th>Member Name</th>
             <th>Date</th>
             <th>Status</th>
+            <th>Time</th> <!-- New column for time -->
         </tr>
     </thead>
     <tbody>
         {% for record in records %}
             <tr>
                 <td>{{ record.user.name }}</td>
-                <td>{{ record.choir.name }}</td>
                 <td>{{ record.date }}</td>
                 <td>{{ record.status }}</td>
+                <td>{{ record.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td> <!-- Format the timestamp -->
             </tr>
         {% endfor %}
-    </tbody>
+    </tbody>    
 </table>
 {% endblock %}

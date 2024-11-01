@@ -1,30 +1,75 @@
 {% extends "base.html" %}
-
 {% block title %}Add Attendance{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Add Attendance</h1>
-    <form method="POST">
-        {{ form.hidden_tag() }}
+    <h1 class="mb-4">Add Attendance</h1>
+
+    <form method="GET" action="{{ url_for('main.add_attendance') }}" id="choirForm">
         <div class="form-group">
-            {{ form.user_id.label(class="form-label") }}
-            {{ form.user_id(class="form-control") }}
+            <label for="choirSelect">Select Choir:</label>
+            <select class="form-control" id="choirSelect" name="choir_id" onchange="this.form.submit()">
+                <option value="">-- Select Choir --</option>
+                {% for choir in choirs %}
+                    <option value="{{ choir.id }}" {% if choir.id == selected_choir_id %}selected{% endif %}>{{ choir.name }}</option>
+                {% endfor %}
+            </select>
         </div>
-        <div class="form-group">
-            {{ form.choir_id.label(class="form-label") }}
-            {{ form.choir_id(class="form-control") }}
-        </div>
-        <div class="form-group">
-            {{ form.date.label(class="form-label") }}
-            {{ form.date(class="form-control") }}
-        </div>
-        <div class="form-group">
-            {{ form.status.label(class="form-label") }}
-            {{ form.status(class="form-control") }}
-        </div>
-        <button type="submit" class="btn btn-primary">Add Attendance</button>
     </form>
-    <a href="{{ url_for('main.view_attendance') }}" class="btn btn-secondary mt-3">View Attendance Records</a>
+
+    {% if members %}
+        <form method="POST" id="attendanceForm">
+            <div class="form-group">
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <button type="button" class="btn btn-success" onclick="markAll('Present')">Mark All Present</button>
+                <button type="button" class="btn btn-danger" onclick="markAll('Absent')">Mark All Absent</button>
+            </div>
+
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Member Name</th>
+                        <th>Attendance Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member in members %}
+                        <tr>
+                            <td>{{ member.name }}</td>
+                            <td>
+                                <select name="status[{{ member.id }}]" class="form-control attendance-status">
+                                    <option value="Present" {% if member.attendance_status == 'Present' %}selected{% endif %}>Present</option>
+                                    <option value="Absent" {% if member.attendance_status == 'Absent' %}selected{% endif %}>Absent</option>
+                                </select>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <button type="submit" class="btn btn-primary mt-3">Save Attendance</button>
+        </form>
+    {% else %}
+        <p>Please select a choir to load its members.</p>
+    {% endif %}
 </div>
+
+<script>
+    function markAll(status) {
+        const selectElements = document.querySelectorAll('.attendance-status');
+        selectElements.forEach(select => select.value = status);
+    }
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        messages.forEach(([category, message]) => {
+            alert(message);
+        });
+    {% endif %}
+    {% endwith %}
+</script>
 {% endblock %}

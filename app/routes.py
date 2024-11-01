@@ -4,6 +4,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from .forms import LoginForm, AddUserForm, AttendanceFilterForm, AddChoirForm, AddAttendanceForm, ProfileForm
 from .models import User, Attendance, Choir
 from . import db, login_manager 
+from datetime import datetime
+from uuid import uuid4
 
 main = Blueprint("main", __name__)
 
@@ -34,6 +36,8 @@ def dashboard():
     return render_template("organizer_dashboard.html" if current_user.role == "organizer" else "member_dashboard.html")
 @main.route("/add_user", methods=["GET", "POST"])
 
+
+
 @main.route("/add_user", methods=["GET", "POST"])
 @login_required
 def add_user():
@@ -51,7 +55,14 @@ def add_user():
             counter += 1
 
         password = f"{username}123"
+        
+        # Generate a unique member_id
+        member_id = str(uuid4())
+        while User.query.filter_by(member_id=member_id).first():
+            member_id = str(uuid4())  # Regenerate until unique
+
         new_user = User(
+            member_id=member_id,
             username=username,
             name=form.name.data,
             password=generate_password_hash(password),
@@ -73,6 +84,7 @@ def add_user():
             return redirect(url_for("main.add_user"))
 
     return render_template("add_user.html", form=form)
+
 
 @main.route("/view_users", methods=["GET"])
 @login_required
@@ -136,32 +148,106 @@ def view_attendance():
         return redirect(url_for("main.index"))
 
     # Fetch all attendance records with users and choirs
-    attendance_records = Attendance.query.join(User).join(Choir).all()
-    print(f"Number of attendance records fetched: {len(attendance_records)}")
+    attendance_query = Attendance.query.join(User).join(Choir)
 
-    return render_template("view_attendance.html", records=attendance_records)
+    # Filter by choir
+    choir_filter = request.args.get('choir_id', type=int)
+    if choir_filter:
+        attendance_query = attendance_query.filter(Attendance.choir_id == choir_filter)
+
+    # Filter by date
+    date_filter = request.args.get('date')
+    if date_filter:
+        attendance_query = attendance_query.filter(Attendance.date == date_filter)
+
+    # Fetch attendance records
+    attendance_records = attendance_query.all()
+    
+    # Fetch choirs for filtering
+    choirs = Choir.query.all()
+    
+    return render_template("view_attendance.html", records=attendance_records, choirs=choirs)
 
 @main.route("/add_attendance", methods=["GET", "POST"])
 @login_required
 def add_attendance():
+    # Check if the current user has permission
     if current_user.role != "organizer":
         flash("You do not have permission to view this page.", "danger")
         return redirect(url_for("main.index"))
 
+    # Fetch all choirs for selection
+    choirs = Choir.query.all()
+    selected_choir_id = request.args.get('choir_id', type=int)
+    members = []
     form = AddAttendanceForm()
-    if form.validate_on_submit():
-        new_attendance = Attendance(
-            user_id=form.user_id.data.id,
-            choir_id=form.choir_id.data.id,
-            date=form.date.data,
-            status=form.status.data
-        )
-        db.session.add(new_attendance)
-        db.session.commit()
-        flash("Attendance added successfully.", "success")
-        return redirect(url_for("main.view_attendance"))
 
-    return render_template("add_attendance.html", form=form)
+    # Fetch members of the selected choir if a choir is selected
+    if selected_choir_id:
+        choir = Choir.query.get(selected_choir_id)
+        if choir:
+            members = choir.members
+            for member in members:
+                attendance_record = Attendance.query.filter_by(
+                    user_id=member.id,
+                    choir_id=selected_choir_id,
+                    date=datetime.utcnow().date()
+                ).first()
+                member.attendance_status = attendance_record.status if attendance_record else None
+        else:
+            flash("Choir not found.", "danger")
+            return redirect(url_for("main.add_attendance"))
+
+    if request.method == "POST":
+        try:
+            # Get and format date from the form
+            date_str = request.form.get("date")
+            date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            attendance_data = request.form.to_dict()
+
+            # Process attendance for each choir member
+            for member_id, status in attendance_data.items():
+                if member_id.startswith("status["):
+                    # Extract member ID
+                    member_id = int(member_id[7:-1])
+                    existing_attendance = Attendance.query.filter_by(
+                        user_id=member_id,
+                        date=date,
+                        choir_id=selected_choir_id
+                    ).first()
+
+                    if existing_attendance:
+                        # Update existing attendance
+                        existing_attendance.status = status
+                    else:
+                        # Create new attendance record
+                        new_attendance = Attendance(
+                            user_id=member_id,
+                            choir_id=selected_choir_id,
+                            date=date,
+                            status=status,
+                            timestamp=datetime.utcnow()
+                        )
+                        db.session.add(new_attendance)
+
+            db.session.commit()
+            flash("Attendance records updated successfully.", "success")
+            return redirect(url_for("main.view_attendance", choir_id=selected_choir_id, date=date_str))
+
+        except ValueError:
+            flash("Invalid date format. Please use YYYY-MM-DD.", "danger")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"An error occurred: {str(e)}", "danger")
+
+    # Render the attendance form
+    return render_template(
+        "add_attendance.html",
+        choirs=choirs,
+        members=members,
+        form=form,
+        selected_choir_id=selected_choir_id
+    )
 
 @main.route("/delete_user/<int:user_id>", methods=["POST"])
 @login_required
@@ -185,15 +271,18 @@ def add_choir():
 
     form = AddChoirForm()
     if form.validate_on_submit():
-        new_choir = Choir(
-            name=form.name.data
-        )
-        db.session.add(new_choir)
-        db.session.commit()
-        flash("Choir added successfully.", "success")
-        return redirect(url_for("main.view_choirs"))
+        new_choir = Choir(name=form.name.data)
 
+        try:
+            db.session.add(new_choir)
+            db.session.commit()
+            flash("Choir added successfully!", "success")
+            return redirect(url_for("main.view_choirs"))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"An error occurred: {str(e)}", "danger")
     return render_template("add_choir.html", form=form)
+
 
 @main.route("/view_choirs")
 @login_required

@@ -25,13 +25,6 @@ class ProfileForm(FlaskForm):
     choirs = QuerySelectMultipleField('Choirs', query_factory=lambda: Choir.query.all(), get_label='name')
 
 class AddAttendanceForm(FlaskForm):
-    user_id = QuerySelectField(
-        'User',
-        query_factory=lambda: User.query.all(),
-        get_label='name',
-        allow_blank=True,
-        validators=[DataRequired()]
-    )
     choir_id = QuerySelectField(
         'Choir',
         query_factory=lambda: Choir.query.all(),
@@ -40,8 +33,8 @@ class AddAttendanceForm(FlaskForm):
         validators=[DataRequired()]
     )
     date = DateField('Date', format='%Y-%m-%d', validators=[DataRequired()])
-    status = SelectField('Status', choices=[('present', 'Present'), ('absent', 'Absent')], validators=[DataRequired()])
-    submit = SubmitField('Add Attendance')
+    submit = SubmitField('Save Attendance')
+
 
 class AttendanceFilterForm(FlaskForm):
     user = QuerySelectField(
