@@ -427,8 +427,6 @@ def profile():
         current_user.name = form.name.data
         current_user.mobile = form.mobile.data
         current_user.dob = form.dob.data
-        current_user.address = form.address.data  # New field for address
-        current_user.emergency_contact = form.emergency_contact.data  # New field for emergency contact
 
         if form.password.data:
             current_user.password = generate_password_hash(form.password.data)

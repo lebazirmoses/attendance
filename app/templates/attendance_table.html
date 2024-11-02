@@ -10,7 +10,7 @@
         <table class="table table-bordered table-striped table-hover" id="attendanceTable">
             <thead class="thead-dark">
                 <tr>
-                    <th style="width: 200px;">User</th>  <!-- Set a fixed width for the User column -->
+                    <th style="width: 200px;">User</th>
                     {% for date in attendance_dates %}
                         <th>{{ date.strftime("%Y-%m-%d") }}</th>
                     {% endfor %}
@@ -37,7 +37,6 @@
         </table>
     </div>
 
-    <!-- Add a Filter Feature -->
     <div class="my-4 text-center">
         <input type="text" id="searchInput" placeholder="Search Users..." class="form-control w-50 mx-auto" aria-label="Search Users">
     </div>
@@ -48,18 +47,19 @@
         // Search filter for table
         const searchInput = document.getElementById('searchInput');
         searchInput.addEventListener('keyup', function() {
-            const filter = searchInput.value.toLowerCase();
+            const filter = searchInput.value.toLowerCase().trim();
             const rows = document.querySelectorAll('#attendanceTable tbody tr');
+
             rows.forEach(row => {
-                const userName = row.cells[0].textContent.toLowerCase();
+                const userName = row.cells[0].textContent.toLowerCase().trim();
                 row.style.display = userName.includes(filter) ? '' : 'none';
             });
         });
 
-        // Add sorting functionality
+        // Sorting functionality
         const table = document.getElementById('attendanceTable');
         const headers = table.querySelectorAll('th');
-
+        
         headers.forEach((header, index) => {
             header.addEventListener('click', function() {
                 const direction = header.classList.contains('asc') ? 'desc' : 'asc';
@@ -70,13 +70,22 @@
         });
 
         function sortTable(table, column, direction) {
-            const rows = Array.from(table.rows).slice(1); // Exclude the header row
+            const rows = Array.from(table.querySelectorAll('tbody tr'));
+            const isNumericColumn = column >= headers.length - 3; // Adjust as needed for numeric columns (e.g., Attendance Percentage)
+
             rows.sort((a, b) => {
                 const aText = a.cells[column].textContent.trim();
                 const bText = b.cells[column].textContent.trim();
-                return direction === 'asc' ? aText.localeCompare(bText) : bText.localeCompare(aText);
+                
+                const aValue = isNumericColumn ? parseFloat(aText) || 0 : aText;
+                const bValue = isNumericColumn ? parseFloat(bText) || 0 : bText;
+                
+                if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+                if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+                return 0;
             });
-            rows.forEach(row => table.appendChild(row)); // Re-append sorted rows
+
+            rows.forEach(row => table.querySelector('tbody').appendChild(row));
         }
     });
 </script>
