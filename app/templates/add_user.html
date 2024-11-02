@@ -55,7 +55,7 @@
     </form>
 </div>
 
-<!-- Optional: Add custom JavaScript for enhanced validation -->
+<!-- JavaScript for enhanced validation and interactivity -->
 <script>
     (function () {
         'use strict';
@@ -68,31 +68,45 @@
                 if (!form.checkValidity()) {
                     event.preventDefault();
                     event.stopPropagation();
+                    displayFeedback('Please fill in all required fields correctly.', 'danger');
+                } else {
+                    displayFeedback('User added successfully!', 'success');
                 }
                 form.classList.add('was-validated');
             }, false);
         });
+
+        // Function to toggle all choir checkboxes
+        function toggleAllChoirs() {
+            const checkboxes = document.querySelectorAll('.choir-list input[type="checkbox"]');
+            const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = !allChecked;
+            });
+        }
+
+        // Search functionality for choirs
+        document.getElementById('searchChoir').addEventListener('keyup', function() {
+            const filter = this.value.toLowerCase();
+            const choirItems = document.querySelectorAll('.choir-item');
+
+            choirItems.forEach(item => {
+                const label = item.querySelector('label').textContent.toLowerCase();
+                item.style.display = label.includes(filter) ? '' : 'none';
+            });
+        });
+
+        // Function to display feedback messages
+        function displayFeedback(message, type) {
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.className = `alert alert-${type}`;
+            feedbackDiv.innerText = message;
+            document.querySelector('.container').insertBefore(feedbackDiv, document.querySelector('form'));
+            setTimeout(() => {
+                feedbackDiv.remove();
+            }, 3000);
+        }
     })();
-
-    // Function to toggle all choir checkboxes
-    function toggleAllChoirs() {
-        const checkboxes = document.querySelectorAll('.choir-list input[type="checkbox"]');
-        const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = !allChecked;
-        });
-    }
-
-    // Search functionality for choirs
-    document.getElementById('searchChoir').addEventListener('keyup', function() {
-        const filter = this.value.toLowerCase();
-        const choirItems = document.querySelectorAll('.choir-item');
-
-        choirItems.forEach(item => {
-            const label = item.querySelector('label').textContent.toLowerCase();
-            item.style.display = label.includes(filter) ? '' : 'none';
-        });
-    });
 </script>
 
 <style>

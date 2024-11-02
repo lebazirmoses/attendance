@@ -66,9 +66,9 @@
         <div class="form-group">
             <label class="form-label">Choirs:</label>
             <ul class="list-group">
-                {% for choir in current_user.choirs %}  {# Assuming current_user.choirs contains only the user's choirs #}
+                {% for choir in current_user.choirs %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        {{ choir.name }}  {# Assuming each choir has a name attribute #}
+                        {{ choir.name }}
                         <span class="badge badge-success">Member</span>
                     </li>
                 {% else %}

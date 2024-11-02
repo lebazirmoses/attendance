@@ -4,82 +4,125 @@
 
 {% block content %}
 <div class="container-fluid mt-5">
-    <h2 class="text-center">{{ choir.name }} Dashboard</h2>
+    <h2 class="text-center mb-4">{{ choir.name }} Dashboard</h2>
 
     <!-- Metrics Section -->
     <div class="row mb-4">
-        <div class="col-lg-4 col-md-6 mb-3">
-            <div class="card text-center">
-                <div class="card-header">Total Days</div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-header bg-primary text-white">Total Days</div>
                 <div class="card-body">
-                    <h5 class="card-title">{{ total_days }}</h5>
+                    <h5 class="card-title display-4">{{ total_days }}</h5>
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 col-md-6 mb-3">
-            <div class="card text-center">
-                <div class="card-header">Present Count</div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-header bg-success text-white">Present Count</div>
                 <div class="card-body">
-                    <h5 class="card-title">{{ present_count }}</h5>
+                    <h5 class="card-title display-4">{{ present_count }}</h5>
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 col-md-6 mb-3">
-            <div class="card text-center">
-                <div class="card-header">Absent Count</div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-header bg-danger text-white">Absent Count</div>
                 <div class="card-body">
-                    <h5 class="card-title">{{ absent_count }}</h5>
+                    <h5 class="card-title display-4">{{ absent_count }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-header bg-info text-white">Total Members</div>
+                <div class="card-body">
+                    <h5 class="card-title display-4">{{ total_members }}</h5>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Attendance Summary -->
-    <h3>Attendance Summary</h3>
-    <ul class="list-unstyled">
-        <li>Saturdays: <strong>{{ attendance_summary.saturdays }}</strong></li>
-        <li>Sundays: <strong>{{ attendance_summary.sundays }}</strong></li>
-    </ul>
+    <div class="mb-4">
+        <h3>Attendance Summary</h3>
+        <ul class="list-unstyled">
+            <li>Saturdays: <strong>{{ attendance_summary.saturdays }}</strong></li>
+            <li>Sundays: <strong>{{ attendance_summary.sundays }}</strong></li>
+        </ul>
+    </div>
 
     <!-- Members Leaderboard -->
-    <h3>Members Leaderboard</h3>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Days Attended</th>
-                <th>Days Absent</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for member in members %}
+    <div class="mb-4">
+        <h3>Members Leaderboard</h3>
+        <div class="d-flex justify-content-end mb-2">
+            <button id="sort-attended" class="btn btn-primary btn-sm me-2">Sort by Days Attended</button>
+            <button id="sort-absent" class="btn btn-secondary btn-sm">Sort by Days Absent</button>
+        </div>
+        <table class="table table-striped table-hover" id="leaderboard">
+            <thead class="thead-dark">
                 <tr>
-                    <td>{{ member.name }}</td>
-                    <td>{{ member.attendance_days }}</td>
-                    <td>{{ member.absence_days }}</td>
+                    <th>Name</th>
+                    <th>Days Attended</th>
+                    <th>Days Absent</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for member in members %}
+                    <tr>
+                        <td>{{ member.name }}</td>
+                        <td class="attendance-days">{{ member.attendance_days }}</td>
+                        <td class="absence-days">{{ member.absence_days }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
     <!-- Attendance Trends for Present Attendees -->
-    <h3>Attendance Trends (Present)</h3>
-    <canvas id="attendance-line-chart" height="400"></canvas>
+    <div class="mb-4">
+        <h3>Attendance Trends (Present)</h3>
+        <canvas id="attendance-line-chart" height="400"></canvas>
+    </div>
 
     <!-- Monthly Attendance Overview -->
-    <h3>Monthly Attendance Overview</h3>
-    <canvas id="monthly-attendance-chart" height="400"></canvas>
+    <div class="mb-4">
+        <h3>Monthly Attendance Overview</h3>
+        <canvas id="monthly-attendance-chart" height="400"></canvas>
+    </div>
 
-    <h3>Attendance Rate (%)</h3>
-    <canvas id="attendance-rate-chart" height="400"></canvas>
+    <!-- Attendance Rate (%) -->
+    <div class="mb-4">
+        <h3>Attendance Rate (%)</h3>
+        <canvas id="attendance-rate-chart" height="400"></canvas>
+    </div>
 
-    <!-- Suggestions for Improvement -->
-    <h3>Suggestions for Improvement</h3>
-    <p>Based on attendance trends, consider engaging with members who have lower attendance to encourage participation.</p>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // Sorting function for the leaderboard
+    document.getElementById('sort-attended').addEventListener('click', function() {
+        sortTable(1);
+    });
+
+    document.getElementById('sort-absent').addEventListener('click', function() {
+        sortTable(2);
+    });
+
+    function sortTable(columnIndex) {
+        const table = document.getElementById('leaderboard');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.rows);
+
+        rows.sort((a, b) => {
+            const aValue = parseInt(a.cells[columnIndex].textContent);
+            const bValue = parseInt(b.cells[columnIndex].textContent);
+            return bValue - aValue; // Sort descending
+        });
+
+        rows.forEach(row => tbody.appendChild(row)); // Reorder rows in the DOM
+    }
+
     // Present Attendance Trends Chart
     const labels = {{ attendance_dates | tojson }};
     const presentAttendanceData = {
@@ -103,27 +146,22 @@
         options: {
             responsive: true,
             plugins: {
-                legend: {
-                    display: false
-                },
+                legend: { display: false },
                 title: {
                     display: true,
-                    text: 'Present Attendance Trends Over Time'
+                    text: 'Present Attendance Trends Over Time',
+                    font: { size: 18 }
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Number of Present Attendees'
-                    }
+                    title: { display: true, text: 'Number of Present Attendees' },
+                    grid: { color: '#e3e3e3' }
                 },
                 x: {
-                    title: {
-                        display: true,
-                        text: 'Date'
-                    }
+                    title: { display: true, text: 'Date' },
+                    grid: { color: '#e3e3e3' }
                 }
             }
         }
@@ -150,28 +188,22 @@
         options: {
             responsive: true,
             plugins: {
-                legend: {
-                    display: true,
-                    position: 'top'
-                },
+                legend: { display: true, position: 'top' },
                 title: {
                     display: true,
-                    text: 'Monthly Attendance Overview'
+                    text: 'Monthly Attendance Overview',
+                    font: { size: 18 }
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Number of Days'
-                    }
+                    title: { display: true, text: 'Number of Days' },
+                    grid: { color: '#e3e3e3' }
                 },
                 x: {
-                    title: {
-                        display: true,
-                        text: 'Months'
-                    }
+                    title: { display: true, text: 'Months' },
+                    grid: { color: '#e3e3e3' }
                 }
             }
         }
@@ -183,7 +215,8 @@
         datasets: [{
             label: 'Attendance Rate',
             data: [{{ present_count }}, {{ absent_count }}],
-            backgroundColor: ['#4CAF50', '#F44336']
+            backgroundColor: ['#4CAF50', '#F44336'],
+            hoverOffset: 4
         }]
     };
 
@@ -194,13 +227,11 @@
         options: {
             responsive: true,
             plugins: {
-                legend: {
-                    display: true,
-                    position: 'top'
-                },
+                legend: { display: true, position: 'top' },
                 title: {
                     display: true,
-                    text: 'Overall Attendance Rate'
+                    text: 'Overall Attendance Rate',
+                    font: { size: 18 }
                 }
             }
         }

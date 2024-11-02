@@ -34,12 +34,11 @@
                                 <td>{{ record.date.strftime('%d %b %Y') }}</td>
                                 <td>{{ record.status }}</td>
                             </tr>
-                            {% endfor %}
-                            {% if attendance_trends|length == 0 %}
+                            {% else %}
                             <tr>
                                 <td colspan="2">No attendance records found.</td>
                             </tr>
-                            {% endif %}
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -128,7 +127,6 @@
         });
 
         document.getElementById('downloadRecords').addEventListener('click', function() {
-            // Logic to download attendance records (you can implement this feature as needed)
             alert('Download feature coming soon!');
         });
     </script>

@@ -2,9 +2,9 @@
 {% block title %}View Choirs{% endblock %}
 {% block content %}
 <div class="container mt-5">
-    <h1>Choirs</h1>
+    <h1 class="mb-4">Choirs</h1>
     <a href="{{ url_for('main.add_choir') }}" class="btn btn-primary mb-4">Add New Choir</a>
-    <table class="table">
+    <table class="table table-bordered table-striped">
         <thead>
             <tr>
                 <th>ID</th>

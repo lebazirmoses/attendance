@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from .forms import LoginForm, AddUserForm, AttendanceFilterForm, AddChoirForm, AddAttendanceForm, ProfileForm
-from .models import User, Attendance, Choir, Event
+from .models import User, Attendance, Choir, Event, user_choir_association
 from . import db, login_manager 
 from datetime import datetime, date
 from uuid import uuid4
@@ -529,13 +529,17 @@ def update_user_attendance():
 @main.route("/choir_dashboard/<int:choir_id>")
 @login_required
 def choir_dashboard(choir_id):
+    # Retrieve the choir object or return a 404 error if not found
     choir = Choir.query.get_or_404(choir_id)
     attendance_records = Attendance.query.filter_by(choir_id=choir_id).all()
-    
+
     # Calculate total days and attendance summary
     total_days = len(set(record.date for record in attendance_records))
     present_count = sum(1 for record in attendance_records if record.status.lower() == 'present')
     absent_count = total_days - present_count
+
+    # Count total members in the choir
+    total_members = User.query.join(user_choir_association).filter(user_choir_association.c.choir_id == choir_id).count()
 
     # Prepare data for leaderboard
     leaderboard = {}
@@ -581,10 +585,10 @@ def choir_dashboard(choir_id):
     monthly_attendance_dates = list(monthly_attendance.keys())
     monthly_attendance_days = [data['present'] for data in monthly_attendance.values()]
 
-    # Prepare attendance summary
+    # Prepare attendance summary for Saturdays and Sundays
     attendance_summary = {
-        "saturdays": sum(1 for rec in attendance_records if rec.date.weekday() == 5),
-        "sundays": sum(1 for rec in attendance_records if rec.date.weekday() == 6)
+        "saturdays": sum(1 for rec in attendance_records if rec.date.weekday() == 5),  # Saturday
+        "sundays": sum(1 for rec in attendance_records if rec.date.weekday() == 6)  # Sunday
     }
 
     return render_template("choir_dashboard.html",
@@ -593,12 +597,14 @@ def choir_dashboard(choir_id):
                            total_days=total_days,
                            present_count=present_count,
                            absent_count=absent_count,
+                           total_members=total_members,  # Pass total members to the template
                            attendance_summary=attendance_summary,
                            attendance_dates=attendance_dates,
                            present_attendance_days=present_attendance_days,
                            absent_attendance_days=absent_attendance_days,
                            monthly_attendance_dates=monthly_attendance_dates,
                            monthly_attendance_days=monthly_attendance_days)
+
 
 @main.route("/attendance_table/<int:choir_id>")
 @login_required
