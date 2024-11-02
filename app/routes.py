@@ -13,9 +13,17 @@ main = Blueprint("main", __name__)
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@main.route("/")
+@main.route('/')
 def index():
-    return render_template("index.html")
+    # Check if the user is authenticated
+    if current_user.is_authenticated:
+        return redirect(url_for('main.home'))  # Redirect to the home page if logged in
+    return render_template('index.html')  # Render index page if not logged in
+
+@main.route('/home')
+def home():
+    # Home page content for logged-in users
+    return render_template('home.html')
 
 @main.route("/login", methods=["GET", "POST"])
 def login():
@@ -25,7 +33,7 @@ def login():
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
             flash(f"Welcome back, {user.name}!")
-            return redirect(url_for("main.dashboard"))
+            return redirect(url_for("main.home"))
         else:
             flash("Invalid username or password", "danger")
     return render_template("login.html", form=form)
@@ -401,6 +409,64 @@ def profile():
         attendance_records=attendance_records,
         attendance_trends=attendance_trends
     )   
+
+@main.route("/reports", methods=["GET"])
+@login_required
+def reports():
+    if current_user.role != "organizer":
+        flash("You do not have permission to view this page.", "danger")
+        return redirect(url_for("main.index"))
+
+    # Fetch all attendance records
+    attendance_records = Attendance.query.all()
+
+    # Processing attendance data for aggregation
+    user_attendance = {}
+    choir_attendance = {}
+
+    for record in attendance_records:
+        user_id = record.user_id
+        choir_id = record.choir_id
+        status = record.status.lower()
+
+        # Aggregate by user
+        if user_id not in user_attendance:
+            user_attendance[user_id] = {'present': 0, 'absent': 0}
+        user_attendance[user_id][status] += 1
+
+        # Aggregate by choir
+        if choir_id not in choir_attendance:
+            choir_attendance[choir_id] = {'present': 0, 'absent': 0}
+        choir_attendance[choir_id][status] += 1
+
+    # Prepare data for visualizations
+    user_labels = []
+    user_present_data = []
+    user_absent_data = []
+
+    for user_id, counts in user_attendance.items():
+        user_labels.append(User.query.get(user_id).name)  # Assuming User has a name field
+        user_present_data.append(counts['present'])
+        user_absent_data.append(counts['absent'])
+
+    choir_labels = []
+    choir_present_data = []
+    choir_absent_data = []
+
+    for choir_id, counts in choir_attendance.items():
+        choir_labels.append(Choir.query.get(choir_id).name)  # Assuming Choir has a name field
+        choir_present_data.append(counts['present'])
+        choir_absent_data.append(counts['absent'])
+
+    return render_template("reports.html",
+                           attendance_records=attendance_records,
+                           user_labels=user_labels,
+                           user_present_data=user_present_data,
+                           user_absent_data=user_absent_data,
+                           choir_labels=choir_labels,
+                           choir_present_data=choir_present_data,
+                           choir_absent_data=choir_absent_data)
+
 
 @main.route("/logout")
 @login_required

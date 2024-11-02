@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Attendance System{% endblock %}
+
+{% block content %}
+<div class="container text-center my-5 py-5">
+    <h1 class="display-4">Welcome Back, {{ current_user.name }}!</h1>
+    <p class="lead">Easily manage and view your attendance records in one place.</p>
+    
+    <div class="row mt-4">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm border-primary">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">
+                        <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                    </h5>
+                    <p class="card-text flex-grow-1">Access your dashboard to view detailed attendance records and update your profile.</p>
+                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary btn-lg mt-auto">Dashboard</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm border-secondary">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">
+                        <i class="fas fa-check-circle"></i> Check Attendance
+                    </h5>
+                    <p class="card-text flex-grow-1">See your latest attendance status and updates directly from here.</p>
+                    <a href="{{ url_for('main.view_attendance') }}" class="btn btn-secondary btn-lg mt-auto">View Attendance</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm border-info">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">
+                        <i class="fas fa-chart-line"></i> Attendance Reports
+                    </h5>
+                    <p class="card-text flex-grow-1">Generate and download your attendance reports for better tracking.</p>
+                    <a href="{{ url_for('main.reports') }}" class="btn btn-info btn-lg mt-auto">View Reports</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr class="my-4">
+    
+    <p class="text-muted">Stay on top of your attendance with a few simple clicks.</p>
+</div>
+
+<!-- Include Font Awesome for Icons -->
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+<style>
+    .card:hover {
+        transform: scale(1.05);
+        transition: transform 0.3s ease-in-out;
+    }
+</style>
+
+{% endblock %}

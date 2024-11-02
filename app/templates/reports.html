@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Attendance Reports</h1>
+    <p>Review attendance records and visualizations.</p>
+
+    <h3>User Attendance Summary</h3>
+    <canvas id="userAttendanceChart" width="400" height="200"></canvas>
+
+    <h3>Choir Attendance Summary</h3>
+    <canvas id="choirAttendanceChart" width="400" height="200"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const userLabels = {{ user_labels|tojson }};
+        const userPresentData = {{ user_present_data|tojson }};
+        const userAbsentData = {{ user_absent_data|tojson }};
+        
+        const userCtx = document.getElementById('userAttendanceChart').getContext('2d');
+        new Chart(userCtx, {
+            type: 'bar',
+            data: {
+                labels: userLabels,
+                datasets: [{
+                    label: 'Present',
+                    data: userPresentData,
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                },
+                {
+                    label: 'Absent',
+                    data: userAbsentData,
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        const choirLabels = {{ choir_labels|tojson }};
+        const choirPresentData = {{ choir_present_data|tojson }};
+        const choirAbsentData = {{ choir_absent_data|tojson }};
+        
+        const choirCtx = document.getElementById('choirAttendanceChart').getContext('2d');
+        new Chart(choirCtx, {
+            type: 'bar',
+            data: {
+                labels: choirLabels,
+                datasets: [{
+                    label: 'Present',
+                    data: choirPresentData,
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                },
+                {
+                    label: 'Absent',
+                    data: choirAbsentData,
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</div>
+{% endblock %}

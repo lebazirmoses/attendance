@@ -7,133 +7,79 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $(".alert").delay(5000).fadeOut(400);
-            $('[data-toggle="tooltip"]').tooltip();
-        });
-    </script>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
             background-color: #f4f7fa;
             color: #343a40;
             line-height: 1.6;
-        }
-        h1, h2, h3, h4, h5 {
-            color: #0056b3;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
         .navbar {
             background-color: #0056b3;
-            transition: background-color 0.3s ease;
         }
-        .navbar a {
+        .navbar-brand {
             color: #ffffff;
-            transition: color 0.3s ease;
+            font-weight: bold;
         }
-        .navbar a:hover {
-            color: #ffc107;
+        .navbar a.nav-link, .navbar a.nav-link:hover {
+            color: #ffffff;
+        }
+        .navbar-toggler {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .dropdown-menu {
+            background-color: #ffffff;
+        }
+        .dropdown-item {
+            color: #343a40;
+        }
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: #0056b3;
         }
         .container {
+            flex-grow: 1;
             margin-top: 20px;
-        }
-        .alert {
-            border-radius: 0.5rem;
-            transition: transform 0.3s ease;
-        }
-        .alert:hover {
-            transform: scale(1.02);
-        }
-        .card {
-            border: none;
-            border-radius: 0.5rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            background-color: #ffffff;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-        }
-        .btn {
-            border-radius: 50px;
-            padding: 10px 20px;
-            transition: background-color 0.3s ease, transform 0.3s ease;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            border: none;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-            transform: translateY(-2px);
         }
         footer {
             background-color: #343a40;
             color: #ffffff;
-            padding: 20px 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px 0;
         }
         footer a {
-            color: #ffffff;
-            transition: color 0.3s ease;
-        }
-        footer a:hover {
             color: #ffc107;
         }
-
-        /* Dropdown Menu Styles */
-        .dropdown-menu {
-            background-color: #ffffff; /* White background for dropdown */
-            border: 1px solid #e0e0e0; /* Light border for separation */
-            border-radius: 0.5rem; /* Consistent border radius */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        footer a:hover {
+            color: #ffffff;
         }
-
-        /* Dropdown Item Styles */
-        .dropdown-item {
-            color: #343a40; /* Dark text color for better visibility */
-            padding: 10px 15px; /* Padding for better touch targets */
-            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions */
-        }
-
-        .dropdown-item:hover {
-            background-color: #f8f9fa; /* Light background on hover */
-            color: #0056b3; /* Change text color on hover for better visibility */
-        }
-
-        .dropdown-divider {
-            background-color: #e9ecef; /* Subtle background for dividers */
-        }
-
-        @media (max-width: 768px) {
-            .navbar {
-                text-align: center;
-            }
-            .container {
-                margin-top: 10px;
-            }
-            .card {
-                margin-bottom: 20px;
-            }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 70px;
+            right: 20px;
+            z-index: 1000;
         }
         .fade-in {
             animation: fadeIn 0.5s ease-in;
         }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow">
         <a class="navbar-brand" href="{{ url_for('main.index') }}">Attendance System</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
@@ -142,8 +88,8 @@
                 {% if current_user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">User Options</a>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown">User Options</a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
                             <a class="dropdown-item" href="{{ url_for('main.profile') }}">Profile</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="{{ url_for('main.logout') }}">Logout</a>
@@ -156,41 +102,27 @@
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <!-- Main Content -->
+    <div class="container mt-5 pt-5 fade-in">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} fade-in">{{ message }}</div>
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
         {% block content %}{% endblock %}
     </div>
 
-    <footer class="text-center text-lg-start mt-4">
-        <div class="container p-4">
-            <div class="row">
-                <div class="col-lg-6 col-md-12 mb-4">
-                    <h5 class="text-uppercase">About Us</h5>
-                    <p>Your attendance system for managing events effectively.</p>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h5 class="text-uppercase">Links</h5>
-                    <ul class="list-unstyled">
-                        <li><a class="text-white" href="{{ url_for('main.index') }}">Home</a></li>
-                        <li><a class="text-white" href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
-                        <li><a class="text-white" href="{{ url_for('main.login') }}">Login</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h5 class="text-uppercase">Contact</h5>
-                    <p>Email: lebazir2004@gmail.com<br>Phone: **********</p>
-                </div>
-            </div>
-        </div>
-        <div class="text-center p-3 bg-dark text-white">
-            <button class="btn btn-light btn-sm" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Back to Top</button>
-            <p class="mb-0">© 2024 Attendance System. All rights reserved.</p>
+    <!-- Scroll to Top Button -->
+    <button class="btn btn-light scroll-top-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Footer -->
+    <footer class="text-center text-white">
+        <div class="container">
+            <p>&copy; 2024 Attendance System | <a href="mailto:lebazir2004@gmail.com">Contact Us</a></p>
         </div>
     </footer>
 </body>
