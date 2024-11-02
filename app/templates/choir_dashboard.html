@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}{{ choir.name }} Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <h2 class="text-center">{{ choir.name }} Dashboard</h2>
+
+    <!-- Metrics Section -->
+    <div class="row mb-4">
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card text-center">
+                <div class="card-header">Total Days</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ total_days }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card text-center">
+                <div class="card-header">Present Count</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ present_count }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card text-center">
+                <div class="card-header">Absent Count</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ absent_count }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance Summary -->
+    <h3>Attendance Summary</h3>
+    <ul class="list-unstyled">
+        <li>Saturdays: <strong>{{ attendance_summary.saturdays }}</strong></li>
+        <li>Sundays: <strong>{{ attendance_summary.sundays }}</strong></li>
+    </ul>
+
+    <!-- Members Leaderboard -->
+    <h3>Members Leaderboard</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Days Attended</th>
+                <th>Days Absent</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for member in members %}
+                <tr>
+                    <td>{{ member.name }}</td>
+                    <td>{{ member.attendance_days }}</td>
+                    <td>{{ member.absence_days }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Attendance Trends for Present Attendees -->
+    <h3>Attendance Trends (Present)</h3>
+    <canvas id="attendance-line-chart" height="400"></canvas>
+
+    <!-- Monthly Attendance Overview -->
+    <h3>Monthly Attendance Overview</h3>
+    <canvas id="monthly-attendance-chart" height="400"></canvas>
+
+    <h3>Attendance Rate (%)</h3>
+    <canvas id="attendance-rate-chart" height="400"></canvas>
+
+    <!-- Suggestions for Improvement -->
+    <h3>Suggestions for Improvement</h3>
+    <p>Based on attendance trends, consider engaging with members who have lower attendance to encourage participation.</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Present Attendance Trends Chart
+    const labels = {{ attendance_dates | tojson }};
+    const presentAttendanceData = {
+        labels: labels,
+        datasets: [
+            {
+                label: 'Present',
+                data: {{ present_attendance_days | tojson }},
+                borderColor: '#4CAF50',
+                backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                fill: true,
+                tension: 0
+            }
+        ]
+    };
+
+    const ctxPresent = document.getElementById('attendance-line-chart').getContext('2d');
+    const attendanceLineChart = new Chart(ctxPresent, {
+        type: 'line',
+        data: presentAttendanceData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Present Attendance Trends Over Time'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Present Attendees'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                }
+            }
+        }
+    });
+
+    // Monthly Attendance Overview Chart
+    const monthlyLabels = {{ monthly_attendance_dates | tojson }};
+    const monthlyAttendanceData = {
+        labels: monthlyLabels,
+        datasets: [{
+            label: 'Monthly Attendance',
+            data: {{ monthly_attendance_days | tojson }},
+            backgroundColor: 'rgba(76, 175, 80, 0.5)',
+            borderColor: '#4CAF50',
+            borderWidth: 1,
+            fill: true,
+        }]
+    };
+
+    const ctxMonthly = document.getElementById('monthly-attendance-chart').getContext('2d');
+    const monthlyAttendanceChart = new Chart(ctxMonthly, {
+        type: 'bar',
+        data: monthlyAttendanceData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                },
+                title: {
+                    display: true,
+                    text: 'Monthly Attendance Overview'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Days'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Months'
+                    }
+                }
+            }
+        }
+    });
+
+    // Attendance Rate Chart
+    const attendanceRateData = {
+        labels: ['Present', 'Absent'],
+        datasets: [{
+            label: 'Attendance Rate',
+            data: [{{ present_count }}, {{ absent_count }}],
+            backgroundColor: ['#4CAF50', '#F44336']
+        }]
+    };
+
+    const ctxRate = document.getElementById('attendance-rate-chart').getContext('2d');
+    const attendanceRateChart = new Chart(ctxRate, {
+        type: 'doughnut',
+        data: attendanceRateData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                },
+                title: {
+                    display: true,
+                    text: 'Overall Attendance Rate'
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

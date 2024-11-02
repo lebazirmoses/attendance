@@ -15,9 +15,9 @@
                         <i class="fas fa-users fa-2x"></i> Manage Choirs
                     </h5>
                     <p class="card-text">Total Choirs: <strong>{{ total_choirs }}</strong></p>
-                    <div class="d-flex flex-column">
-                        <a href="{{ url_for('main.add_choir') }}" class="btn btn-primary mb-2" data-toggle="tooltip" title="Add a new choir">Add New Choir</a>
-                        <a href="{{ url_for('main.view_choirs') }}" class="btn btn-secondary" data-toggle="tooltip" title="View existing choirs">View Choirs</a>
+                    <div class="d-flex flex-column align-items-center">
+                        <a href="{{ url_for('main.add_choir') }}" class="btn btn-primary mb-2 w-100" data-toggle="tooltip" title="Add a new choir">Add New Choir</a>
+                        <a href="{{ url_for('main.view_choirs') }}" class="btn btn-secondary mb-2 w-100" data-toggle="tooltip" title="View existing choirs">View Choirs</a>
                     </div>
                 </div>
             </div>
@@ -28,9 +28,9 @@
                         <i class="fas fa-user-friends fa-2x"></i> Manage Users
                     </h5>
                     <p class="card-text">Total Users: <strong>{{ total_users }}</strong></p>
-                    <div class="d-flex flex-column">
-                        <a href="{{ url_for('main.add_user') }}" class="btn btn-primary mb-2" data-toggle="tooltip" title="Add a new user">Add New User</a>
-                        <a href="{{ url_for('main.view_users') }}" class="btn btn-secondary" data-toggle="tooltip" title="View registered users">View Users</a>
+                    <div class="d-flex flex-column align-items-center">
+                        <a href="{{ url_for('main.add_user') }}" class="btn btn-primary mb-2 w-100" data-toggle="tooltip" title="Add a new user">Add New User</a>
+                        <a href="{{ url_for('main.view_users') }}" class="btn btn-secondary mb-2 w-100" data-toggle="tooltip" title="View registered users">View Users</a>
                     </div>
                 </div>
             </div>
@@ -41,9 +41,9 @@
                         <i class="fas fa-calendar-check fa-2x"></i> Manage Attendance
                     </h5>
                     <p class="card-text">Total Attendance Records: <strong>{{ total_attendance }}</strong></p>
-                    <div class="d-flex flex-column">
-                        <a href="{{ url_for('main.add_attendance') }}" class="btn btn-primary" data-toggle="tooltip" title="Add a new attendance record">Add Attendance Record</a>
-                        <a href="{{ url_for('main.view_attendance') }}" class="btn btn-secondary mb-2" data-toggle="tooltip" title="View attendance records">View Attendance Records</a>
+                    <div class="d-flex flex-column align-items-center">
+                        <a href="{{ url_for('main.add_attendance') }}" class="btn btn-primary mb-2 w-100" data-toggle="tooltip" title="Add a new attendance record">Add Attendance Record</a>
+                        <a href="{{ url_for('main.view_attendance') }}" class="btn btn-secondary mb-2 w-100" data-toggle="tooltip" title="View attendance records">View Attendance Records</a>
                     </div>
                 </div>
             </div>
@@ -54,7 +54,7 @@
                         <i class="fas fa-sign-out-alt fa-2x"></i> Logout
                     </h5>
                     <p>You can log out from the system.</p>
-                    <a href="{{ url_for('main.logout') }}" class="btn btn-danger" data-toggle="tooltip" title="Logout from the system">Logout</a>
+                    <a href="{{ url_for('main.logout') }}" class="btn btn-danger w-100" data-toggle="tooltip" title="Logout from the system">Logout</a>
                 </div>
             </div>
         </div>

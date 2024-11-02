@@ -10,6 +10,7 @@
                 <th>ID</th>
                 <th>Name</th>
                 <th>Members</th>
+                <th>Total Attendance</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -34,12 +35,29 @@
                             No members assigned
                         {% endif %}
                     </td>
+                    <td id="attendance-{{ choir.id }}">Loading...</td>
                     <td>
                         <a href="{{ url_for('main.edit_choir', choir_id=choir.id) }}" class="btn btn-secondary">Edit</a>
+                        <a href="{{ url_for('main.choir_dashboard', choir_id=choir.id) }}" class="btn btn-info">Dashboard</a>
                     </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% for choir in choirs %}
+            fetch(`/attendance_count/{{ choir.id }}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('attendance-{{ choir.id }}').textContent = data.count || 0;
+                })
+                .catch(error => {
+                    console.error('Error fetching attendance count:', error);
+                });
+        {% endfor %}
+    });
+</script>
 {% endblock %}

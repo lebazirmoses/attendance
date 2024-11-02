@@ -5,6 +5,7 @@
 <div class="container mt-5">
     <h1 class="mb-4">Add Attendance</h1>
 
+    <!-- Choir Selection Form -->
     <form method="GET" action="{{ url_for('main.add_attendance') }}" id="choirForm">
         <div class="form-group">
             <label for="choirSelect">Select Choir:</label>
@@ -21,7 +22,8 @@
         <form method="POST" id="attendanceForm">
             <div class="form-group">
                 <label for="date">Date:</label>
-                <input type="date" id="date" name="date" class="form-control" required>
+                <input type="date" id="date" name="date" class="form-control" required value="{{ (form.date.data or datetime.utcnow().date()).strftime('%Y-%m-%d') }}" onchange="updateDayOfWeek()">
+                <small id="dayOfWeek" class="form-text text-muted">Day: {{ day_of_week }}</small>
             </div>
 
             <div class="mb-3">
@@ -62,6 +64,14 @@
     function markAll(status) {
         const selectElements = document.querySelectorAll('.attendance-status');
         selectElements.forEach(select => select.value = status);
+    }
+
+    function updateDayOfWeek() {
+        const dateInput = document.getElementById("date");
+        const selectedDate = new Date(dateInput.value);
+        const options = { weekday: 'long' };
+        const dayName = selectedDate.toLocaleDateString('en-US', options);
+        document.getElementById("dayOfWeek").textContent = "Day: " + dayName;
     }
 
     {% with messages = get_flashed_messages(with_categories=true) %}

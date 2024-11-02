@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Choir Selection{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <h2 class="text-center">Select a Choir</h2>
+    <div class="row mb-4">
+        {% for choir in choirs %}
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card text-center">
+                <div class="card-header">
+                    {{ choir.name }}
+                </div>
+                <div class="card-body">
+                    <a href="{{ url_for('choir_dashboard', choir_id=choir.id) }}" class="btn btn-primary">View Dashboard</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

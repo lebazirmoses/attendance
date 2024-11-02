@@ -4,6 +4,7 @@ from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 from wtforms.validators import DataRequired, Length, Optional
 from .models import User, Choir
 from wtforms import StringField, SelectMultipleField, SubmitField
+from datetime import datetime
 
 class LoginForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
@@ -32,7 +33,8 @@ class AddAttendanceForm(FlaskForm):
         allow_blank=True,
         validators=[DataRequired()]
     )
-    date = DateField('Date', format='%Y-%m-%d', validators=[DataRequired()])
+    date = DateField('Date', format='%Y-%m-%d', default=datetime.utcnow().date, validators=[DataRequired()])
+
     submit = SubmitField('Save Attendance')
 
 
