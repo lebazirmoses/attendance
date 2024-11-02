@@ -37,3 +37,4 @@ Werkzeug==3.0.6
 WTForms==3.2.1
 WTForms-SQLAlchemy==0.4.2
 zopfli==0.2.3.post1
+gunicorn==19.7.1
