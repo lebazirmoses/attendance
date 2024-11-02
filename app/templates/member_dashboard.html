@@ -8,7 +8,7 @@
         <div class="col-md-6 mb-4">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">Attendance Overview</h5>
+                    <h5 class="card-title"><i class="fas fa-calendar-check"></i> Attendance Overview</h5>
                     <p><strong>Total Days Attended:</strong> <span class="text-success">{{ present_count }}</span></p>
                     <p><strong>Total Days Absent:</strong> <span class="text-danger">{{ absent_count }}</span></p>
                     <p><strong>Attendance Percentage:</strong> <span class="text-info">{{ attendance_percentage | round(2) }}%</span></p>
@@ -20,7 +20,7 @@
         <div class="col-md-6 mb-4">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">Recent Attendance Trends</h5>
+                    <h5 class="card-title"><i class="fas fa-history"></i> Recent Attendance Trends</h5>
                     <table class="table table-bordered">
                         <thead>
                             <tr>
@@ -54,8 +54,32 @@
         </div>
     </div>
 
+    <h2 class="mt-5 text-center">Upcoming Events</h2>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <ul class="list-group">
+                {% for event in upcoming_events %}
+                <li class="list-group-item">
+                    <strong>{{ event.name }}</strong> - {{ event.date.strftime('%d %b %Y') }}
+                </li>
+                {% endfor %}
+                {% if upcoming_events|length == 0 %}
+                <li class="list-group-item">No upcoming events.</li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+
+    <button class="btn btn-primary mt-4" id="downloadRecords">Download Attendance Records</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         const ctx = document.getElementById('attendanceTrendChart').getContext('2d');
+
+        const gradientFill = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientFill.addColorStop(0, 'rgba(75, 192, 192, 0.4)');
+        gradientFill.addColorStop(1, 'rgba(75, 192, 192, 0.1)');
+
         const attendanceTrendChart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -64,16 +88,21 @@
                     label: 'Attendance Trend',
                     data: {{ trend_data|tojson }},
                     borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderWidth: 2,
+                    backgroundColor: gradientFill,
+                    borderWidth: 3,
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
                     fill: true,
-                    tension: 0.4  // Smooth line
+                    tension: 0  // Smooth line
                 }]
             },
             options: {
                 responsive: true,
                 plugins: {
                     tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false,
                         callbacks: {
                             label: function(tooltipItem) {
                                 const date = tooltipItem.label;
@@ -81,6 +110,10 @@
                                 return `${date}: ${status}`;
                             }
                         }
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top',
                     }
                 },
                 scales: {
@@ -100,8 +133,19 @@
                             text: 'Date'
                         }
                     }
+                },
+                elements: {
+                    point: {
+                        radius: 5,
+                        hoverRadius: 7,
+                    }
                 }
             }
+        });
+
+        document.getElementById('downloadRecords').addEventListener('click', function() {
+            // Logic to download attendance records (you can implement this feature as needed)
+            alert('Download feature coming soon!');
         });
     </script>
 </div>

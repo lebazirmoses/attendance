@@ -38,6 +38,11 @@ def login():
             flash("Invalid username or password", "danger")
     return render_template("login.html", form=form)
 
+from flask import render_template
+from flask_login import login_required, current_user
+from .models import Attendance, Event, User  # Adjust imports as needed
+from datetime import datetime
+
 @main.route("/dashboard")
 @login_required
 def dashboard():
@@ -78,6 +83,7 @@ def dashboard():
         average_attendance_percentage=average_attendance_percentage  # Pass the average attendance percentage
     )
 
+    
 @main.route("/add_user", methods=["GET", "POST"])
 @login_required
 def add_user():
