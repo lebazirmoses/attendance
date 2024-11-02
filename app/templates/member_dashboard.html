@@ -54,22 +54,6 @@
         </div>
     </div>
 
-    <h2 class="mt-5 text-center">Upcoming Events</h2>
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <ul class="list-group">
-                {% for event in upcoming_events %}
-                <li class="list-group-item">
-                    <strong>{{ event.name }}</strong> - {{ event.date.strftime('%d %b %Y') }}
-                </li>
-                {% endfor %}
-                {% if upcoming_events|length == 0 %}
-                <li class="list-group-item">No upcoming events.</li>
-                {% endif %}
-            </ul>
-        </div>
-    </div>
-
     <button class="btn btn-primary mt-4" id="downloadRecords">Download Attendance Records</button>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
