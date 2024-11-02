@@ -116,3 +116,20 @@
     .fade-in {
         animation: fadeIn 0.5s ease-in;
     }
+    .table th, .table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+    
+    .table-success {
+        background-color: #d4edda !important;
+    }
+    
+    .table-danger {
+        background-color: #f8d7da !important;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+    

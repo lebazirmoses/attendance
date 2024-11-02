@@ -594,6 +594,37 @@ def choir_dashboard(choir_id):
                            monthly_attendance_dates=monthly_attendance_dates,
                            monthly_attendance_days=monthly_attendance_days)
 
+@main.route("/attendance_table/<int:choir_id>")
+@login_required
+def attendance_table(choir_id):
+    choir = Choir.query.get_or_404(choir_id)
+    attendance_records = Attendance.query.filter_by(choir_id=choir_id).all()
+    
+    # Fetch all choirs for the dropdown
+    choirs = Choir.query.all()
+
+    # Prepare data structures
+    attendance_data = {user.id: {} for user in choir.members}
+    for record in attendance_records:
+        attendance_data[record.user_id][record.date] = record.status
+
+    # Calculate totals and percentages
+    for user in choir.members:
+        user.total_present = sum(1 for date in attendance_data[user.id] if attendance_data[user.id][date].lower() == 'present')
+        user.total_absent = sum(1 for date in attendance_data[user.id] if attendance_data[user.id][date].lower() == 'absent')
+        
+        # Calculate attendance percentage
+        total_days = user.total_present + user.total_absent
+        user.attendance_percentage = (user.total_present / total_days * 100) if total_days > 0 else 0
+
+    attendance_dates = sorted(set(record.date for record in attendance_records))
+
+    return render_template("attendance_table.html",
+                           choir=choir,
+                           attendance_dates=attendance_dates,
+                           attendance_data=attendance_data,
+                           choirs=choirs)  # Pass choirs to the template
+
 @main.route("/logout")
 @login_required
 def logout():

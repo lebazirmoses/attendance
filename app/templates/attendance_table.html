@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance Table - {{ choir.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <h1 class="display-4 text-center mb-4">Attendance Table for {{ choir.name }}</h1>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped table-hover" id="attendanceTable">
+            <thead class="thead-dark">
+                <tr>
+                    <th style="width: 200px;">User</th>  <!-- Set a fixed width for the User column -->
+                    {% for date in attendance_dates %}
+                        <th>{{ date.strftime("%Y-%m-%d") }}</th>
+                    {% endfor %}
+                    <th>Total Present</th>
+                    <th>Total Absent</th>
+                    <th>Attendance Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in choir.members %}
+                <tr>
+                    <td>{{ user.name }}</td>
+                    {% for date in attendance_dates %}
+                        <td class="{% if attendance_data[user.id][date] == 'present' %}table-success{% elif attendance_data[user.id][date] == 'absent' %}table-danger{% else %}table-secondary{% endif %}">
+                            {{ attendance_data[user.id].get(date, '-') }}
+                        </td>
+                    {% endfor %}
+                    <td>{{ user.total_present }}</td>
+                    <td>{{ user.total_absent }}</td>
+                    <td>{{ "%.2f"|format(user.attendance_percentage) }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add a Filter Feature -->
+    <div class="my-4 text-center">
+        <input type="text" id="searchInput" placeholder="Search Users..." class="form-control w-50 mx-auto" aria-label="Search Users">
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search filter for table
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('keyup', function() {
+            const filter = searchInput.value.toLowerCase();
+            const rows = document.querySelectorAll('#attendanceTable tbody tr');
+            rows.forEach(row => {
+                const userName = row.cells[0].textContent.toLowerCase();
+                row.style.display = userName.includes(filter) ? '' : 'none';
+            });
+        });
+
+        // Add sorting functionality
+        const table = document.getElementById('attendanceTable');
+        const headers = table.querySelectorAll('th');
+
+        headers.forEach((header, index) => {
+            header.addEventListener('click', function() {
+                const direction = header.classList.contains('asc') ? 'desc' : 'asc';
+                sortTable(table, index, direction);
+                headers.forEach(h => h.classList.remove('asc', 'desc'));
+                header.classList.add(direction);
+            });
+        });
+
+        function sortTable(table, column, direction) {
+            const rows = Array.from(table.rows).slice(1); // Exclude the header row
+            rows.sort((a, b) => {
+                const aText = a.cells[column].textContent.trim();
+                const bText = b.cells[column].textContent.trim();
+                return direction === 'asc' ? aText.localeCompare(bText) : bText.localeCompare(aText);
+            });
+            rows.forEach(row => table.appendChild(row)); // Re-append sorted rows
+        }
+    });
+</script>
+{% endblock %}

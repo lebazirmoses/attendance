@@ -39,6 +39,7 @@
                     <td>
                         <a href="{{ url_for('main.edit_choir', choir_id=choir.id) }}" class="btn btn-secondary">Edit</a>
                         <a href="{{ url_for('main.choir_dashboard', choir_id=choir.id) }}" class="btn btn-info">Dashboard</a>
+                        <a href="{{ url_for('main.attendance_table', choir_id=choir.id) }}" class="btn btn-primary">Attendance Table</a>
                     </td>
                 </tr>
             {% endfor %}
