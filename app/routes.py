@@ -172,6 +172,7 @@ def record_attendance(member_id, status):
     db.session.commit()
 
 
+
 @main.route("/edit_user/<int:user_id>", methods=["GET", "POST"])
 @login_required
 def edit_user(user_id):
@@ -242,6 +243,25 @@ def view_attendance():
     choirs = Choir.query.all()
     
     return render_template("view_attendance.html", records=attendance_records, choirs=choirs)
+
+@main.route("/delete_user/<int:user_id>", methods=["POST"])
+@login_required
+def delete_user(user_id):
+    if current_user.role != "organizer":
+        flash("You do not have permission to perform this action.", "danger")
+        return redirect(url_for("main.view_users"))
+    
+    user = User.query.get_or_404(user_id)
+    try:
+        db.session.delete(user)
+        db.session.commit()
+        flash("User deleted successfully.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash("An error occurred while deleting the user.", "danger")
+        print(f"Error: {e}")
+    
+    return redirect(url_for("main.view_users"))
 
 
 @main.route("/add_attendance", methods=["GET", "POST"])
@@ -328,7 +348,7 @@ def add_attendance():
     )
 
 
-@main.route("/delete_user/<int:user_id>", methods=["POST"])
+@main.route("/delete_user/<int:user_id>", methods=["POST"], endpoint="delete_user_unique")
 @login_required
 def delete_user(user_id):
     if current_user.role != "organizer":
